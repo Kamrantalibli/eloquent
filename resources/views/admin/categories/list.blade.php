@@ -41,18 +41,35 @@
                         <td>Mark</td>
                         <td>Otto</td>
                         <td>@mdo</td>
+                        <td>Mark</td>
+                        <td>Otto</td>
+                        <td>@mdo</td>
+                        <td>Mark</td>
+                        <td>Otto</td>
                     </tr>
                     <tr>
                         <th scope="row">2</th>
                         <td>Jacob</td>
                         <td>Thornton</td>
                         <td>@fat</td>
+                        <td>Jacob</td>
+                        <td>Thornton</td>
+                        <td>@fat</td>
+                        <td>Jacob</td>
+                        <td>Thornton</td>
                     </tr>
                     <tr>
                         <th scope="row">3</th>
-                        <td colspan="2">Larry the Bird</td>
+                        <td>Larry</td>
+                        <td>Bird</td>
                         <td>@twitter</td>
+                        <td>Larry</td>
+                        <td>Bird</td>
+                        <td>@twitter</td>
+                        <td>Larry</td>
+                        <td>Bird</td>
                     </tr>
+                    
                 </x-slot:rows>
             </x-bootstrap.table>   
         </x-slot>
