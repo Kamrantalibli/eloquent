@@ -19,6 +19,38 @@
                     <i class="material-icons-two-tone">dashboard</i>Dashboard
                 </a>
             </li>
+
+            <li class="{{ Route::is('article.index') || Route::is('article.create') ? 'open' : '' }}">
+                <a href="#">
+                    <i class="material-icons-two-tone">tune</i>
+                    Article Management
+                    <i class="material-icons has-sub-menu">keyboard_arrow_right</i>
+                </a>
+                <ul class="sub-menu">
+                    <li>
+                        <a href="{{ route('article.create') }}" class="{{ Route::is('article.create') ? 'active' : '' }}">Article Create</a>
+                    </li>
+                    <li>
+                        <a href="{{ route('article.index') }}" class="{{ Route::is('article.index') ? 'active' : '' }}">Article List</a>
+                    </li>
+                </ul>
+            </li>
+
+            <li class="{{ Route::is('category.index') || Route::is('category.create') ? 'open' : '' }}">
+                <a href="#">
+                    <i class="material-icons-two-tone">tune</i>
+                    Category Management
+                    <i class="material-icons has-sub-menu">keyboard_arrow_right</i>
+                </a>
+                <ul class="sub-menu">
+                    <li>
+                        <a href="{{ route('category.create') }}" class="{{ Route::is('category.create') ? 'active' : '' }}">Category Create</a>
+                    </li>
+                    <li>
+                        <a href="{{ route('category.index') }}" class="{{ Route::is('category.index') ? 'active' : '' }}">Category List</a>
+                    </li>
+                </ul>
+            </li>
         </ul>
     </div>
 </div>
