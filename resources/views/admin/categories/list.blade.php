@@ -36,40 +36,36 @@
                     <th scope="col">Actions</th>    
                 </x-slot:columns>
                 <x-slot:rows>
-                    <tr>
-                        <th scope="row">1</th>
-                        <td>Mark</td>
-                        <td>Otto</td>
-                        <td>@mdo</td>
-                        <td>Mark</td>
-                        <td>Otto</td>
-                        <td>@mdo</td>
-                        <td>Mark</td>
-                        <td>Otto</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">2</th>
-                        <td>Jacob</td>
-                        <td>Thornton</td>
-                        <td>@fat</td>
-                        <td>Jacob</td>
-                        <td>Thornton</td>
-                        <td>@fat</td>
-                        <td>Jacob</td>
-                        <td>Thornton</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">3</th>
-                        <td>Larry</td>
-                        <td>Bird</td>
-                        <td>@twitter</td>
-                        <td>Larry</td>
-                        <td>Bird</td>
-                        <td>@twitter</td>
-                        <td>Larry</td>
-                        <td>Bird</td>
-                    </tr>
-                    
+                    @foreach ($list as $category)
+                        <tr>
+                            <th scope="row">{{ $category->name }}</th>
+                            <td>{{ $category->slug }}</td>
+                            <td>
+                                @if ($category->status)
+                                    Active
+                                @else
+                                    Passive                                    
+                                @endif
+                            </td>
+                            <td>
+                                @if ($category->feature_status)
+                                    Active
+                                @else
+                                    Passive                                    
+                                @endif
+                            </td>
+                            <td>{{ substr($category->description, 0, 20) }}</td>
+                            <td>{{ $category->order }}</td>
+                            <td>{{ $category->parentCategory?->name }}</td>
+                            <td>{{ $category->user?->name }}</td>
+                            <td>
+                                <div class="d-flex">
+                                    <a href="" class="btn btn-success"><i class="material-icons">edit</i></a>
+                                    <a href="" class="btn btn-danger"><i class="material-icons">delete</i></a>
+                                </div>
+                            </td>
+                        </tr>
+                    @endforeach
                 </x-slot:rows>
             </x-bootstrap.table>   
         </x-slot>
