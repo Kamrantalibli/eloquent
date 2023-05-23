@@ -60,8 +60,8 @@
                             <td>{{ $category->user?->name }}</td>
                             <td>
                                 <div class="d-flex">
-                                    <a href="" class="btn btn-success"><i class="material-icons">edit</i></a>
-                                    <a href="" class="btn btn-danger"><i class="material-icons">delete</i></a>
+                                    <a href="" class="btn btn-success btn-sm"><i class="material-icons ms-0">edit</i></a>
+                                    <a href="" class="btn btn-danger btn-sm"><i class="material-icons ms-0">delete</i></a>
                                 </div>
                             </td>
                         </tr>
