@@ -42,16 +42,16 @@
                             <td>{{ $category->slug }}</td>
                             <td>
                                 @if ($category->status)
-                                    Active
+                                    <a href="javascript:void(0)" data-id="{{ $category->id  }}" class="btn btn-sm btn-success btnChangeStatus">Active</a>
                                 @else
-                                    Passive                                    
+                                    <a href="javascript:void(0)" data-id="{{ $category->id  }}" class="btn btn-sm btn-danger btnChangeStatus">Passive</a>                                   
                                 @endif
                             </td>
                             <td>
                                 @if ($category->feature_status)
-                                    Active
+                                    <a href="javascript:void(0)" data-id="{{ $category->id  }}" class="btn btn-sm btn-success btnChangeFeatureStatus">Active</a>
                                 @else
-                                    Passive                                    
+                                    <a href="javascript:void(0)" data-id="{{ $category->id  }}" class="btn btn-sm btn-danger btnChangeFeatureStatus">Passive</a>                                   
                                 @endif
                             </td>
                             <td>{{ substr($category->description, 0, 20) }}</td>
@@ -60,8 +60,8 @@
                             <td>{{ $category->user?->name }}</td>
                             <td>
                                 <div class="d-flex">
-                                    <a href="" class="btn btn-success btn-sm"><i class="material-icons ms-0">edit</i></a>
-                                    <a href="" class="btn btn-danger btn-sm"><i class="material-icons ms-0">delete</i></a>
+                                    <a href="javascript:void(0)" class="btn btn-warning btn-sm"><i class="material-icons ms-0">edit</i></a>
+                                    <a href="javascript:void(0)" class="btn btn-danger btn-sm"><i class="material-icons ms-0">delete</i></a>
                                 </div>
                             </td>
                         </tr>
@@ -70,7 +70,74 @@
             </x-bootstrap.table>   
         </x-slot>
     </x-bootstrap.card>
+    <form action="" method="POST" id="statusChangeForm">
+        @csrf
+        <input type="hidden" name="id" id="inputStatus" value="">
+    </form>
 @endsection
 
 @section('js')
+    <script>
+        $(document).ready(function () {
+            $('.btnChangeStatus').click(function () {
+                let categoryID = $(this).data('id');
+                console.log(categoryID);
+                $('#inputStatus').val(categoryID);
+
+                Swal.fire({
+                title: 'Are you sure you want to change Status?',
+                showDenyButton: true,
+                showCancelButton: true,
+                confirmButtonText: 'Yes',
+                denyButtonText: `No`,
+                }).then((result) => {
+                /* Read more about isConfirmed, isDenied below */
+                if (result.isConfirmed) {
+                    $('#statusChangeForm').attr('action', "{{ route('categories.changeStatus') }}");
+                    $('#statusChangeForm').submit();
+                } 
+                else if (result.isDenied) {
+                    // Swal.fire('Nothing action taken.', '', 'info')
+                    Swal.fire({
+                        title: 'Info',
+                        text: 'Nothing action taken.',
+                        confirmButtonText: 'OK',
+                        icon: 'info'
+                    });
+                }
+                })
+
+                });  
+        
+            $('.btnChangeFeatureStatus').click(function () {
+                let categoryID = $(this).data('id');
+                console.log(categoryID);
+                $('#inputStatus').val(categoryID);
+
+                Swal.fire({
+                title: 'Are you sure you want to change Feature Status?',
+                showDenyButton: true,
+                showCancelButton: true,
+                confirmButtonText: 'Yes',
+                denyButtonText: `No`,
+                }).then((result) => {
+                /* Read more about isConfirmed, isDenied below */
+                if (result.isConfirmed) {
+                    $('#statusChangeForm').attr('action', "{{ route('categories.changeFeatureStatus') }}");
+                    $('#statusChangeForm').submit();
+                } 
+                else if (result.isDenied) {
+                    // Swal.fire('Nothing action taken.', '', 'info')
+                    Swal.fire({
+                        title: 'Info',
+                        text: 'Nothing action taken.',
+                        confirmButtonText: 'OK',
+                        icon: 'info'
+                    });
+                }
+                })
+
+                })
+            })
+    </script>
 @endsection
