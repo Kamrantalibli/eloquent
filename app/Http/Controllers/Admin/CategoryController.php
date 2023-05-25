@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use App\Models\Category;
+use App\Http\Requests\CategoryStorerequest;
 
 class CategoryController extends Controller
 {
@@ -15,7 +17,39 @@ class CategoryController extends Controller
     }
 
     public function create() {
-        return view('admin.categories.create-update');
+        $categories = Category::all();
+        return view('admin.categories.create-update', compact('categories'));
+    }
+
+    public function store(CategoryStoreRequest $request) {
+        $slug = Str::slug($request->slug);
+        $slugCheck = Category::where('slug', $slug)->first();
+
+        try {
+            //code...
+            $category = new Category();
+            $category->name = $request->name;
+            $category->slug = is_null($slugCheck) ? $slug : Str::slug($request->slug . time());
+            $category->description = $request->description;
+            $category->order = $request->order;
+            $category->parent_id = $request->parent_id;
+            $category->status = $request->status ? 1 : 0;
+            $category->feature_status = $request->feature_status ? 1 : 0;
+            $category->seo_keywords = $request->seo_keywords;
+            $category->seo_description = $request->seo_description;
+            $category->user_id = random_int(1,10);
+            
+            $category->save();
+        } catch (\Exception $exception) {
+            abort(404, $exception->getMessage());
+        }
+            
+        alert()
+            ->success("Successful", "Category Saved")
+            ->showConfirmButton('OK', '#3085d6')
+            ->autoClose(5000);
+
+        return redirect()->back();
     }
 
     public function changeStatus(Request $request) {
@@ -80,6 +114,8 @@ class CategoryController extends Controller
 
     public function edit(Request $request) {
 
+        $categories = Category::all();
+
         $categoryID = $request->id;
 
         $category = Category::where('id', $categoryID)->first();
@@ -97,7 +133,45 @@ class CategoryController extends Controller
         
         }
 
-        return view('admin.categories.create-update', compact($category));
+        return view('admin.categories.create-update', compact('category', 'categories'));
 
     }
+
+    public function update(CategoryStoreRequest $request) {
+        $slug = Str::slug($request->slug);
+        $slugCheck = Category::where('slug', $slug)->first();
+
+        try {
+            //code...
+            $category = Category::find($request->id);
+            $category->name = $request->name;
+            if ((!is_null($slugCheck) && $slugCheck->id == $category->id) || is_null($slugCheck)) {
+                $category->slug = $slug;
+            } else if(!is_null($slugCheck) && $slugCheck->id != $category->id) {
+                $category->slug = Str::slug($slug .time());
+            } else {
+                $category->slug = Str::slug($slug .time());
+            }
+            $category->description = $request->description;
+            $category->order = $request->order;
+            $category->parent_id = $request->parent_id;
+            $category->status = $request->status ? 1 : 0;
+            $category->feature_status = $request->feature_status ? 1 : 0;
+            $category->seo_keywords = $request->seo_keywords;
+            $category->seo_description = $request->seo_description;
+            // $category->user_id = random_int(1,10);
+            
+            $category->save();
+        } catch(\Exception $exception) {
+            abort(404, $exception->getMessage());
+        }
+
+        alert()
+            ->success("Successful", "Category Updated")
+            ->showConfirmButton('OK', '#3085d6')
+            ->autoClose(5000);
+
+        return redirect()->route('category.index');
+    }
+    
 }
