@@ -9,7 +9,7 @@ use App\Models\Category;
 class CategoryController extends Controller
 {
     public function index() {
-        $categories = Category::with(['parentCategory:id,name','user'])->orderBy('order', 'DESC')->get();
+        $categories = Category::with(['parentCategory:id,name','user'])->orderBy('order', 'DESC')->paginate(5);
 
         return view('admin.categories.list', ['list' => $categories]);
     }

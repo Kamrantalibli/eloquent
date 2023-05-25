@@ -72,7 +72,11 @@
                         </tr>
                     @endforeach
                 </x-slot:rows>
-            </x-bootstrap.table>   
+            </x-bootstrap.table>
+            <div class="d-flex justify-content-center">
+                {{-- {{ $list->links('vendor.pagination.bootstrap-5') }}    --}}
+                {{ $list->onEachside(1)->links() }}   
+            </div>
         </x-slot>
     </x-bootstrap.card>
     <form action="" method="POST" id="statusChangeForm">
