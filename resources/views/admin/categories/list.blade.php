@@ -60,8 +60,13 @@
                             <td>{{ $category->user?->name }}</td>
                             <td>
                                 <div class="d-flex">
-                                    <a href="javascript:void(0)" class="btn btn-warning btn-sm"><i class="material-icons ms-0">edit</i></a>
-                                    <a href="javascript:void(0)" class="btn btn-danger btn-sm"><i class="material-icons ms-0">delete</i></a>
+                                    <a href="{{ route('categories.edit', ['id' => $category->id]) }}" class="btn btn-warning btn-sm"><i class="material-icons ms-0">edit</i></a>
+                                    <a href="javascript:void(0)" 
+                                        class="btn btn-danger btn-sm btnDelete"
+                                        data-name="{{ $category->name }}" 
+                                        data-id="{{ $category->id }}" >
+                                            <i class="material-icons ms-0">delete</i>
+                                    </a>
                                 </div>
                             </td>
                         </tr>
@@ -81,7 +86,6 @@
         $(document).ready(function () {
             $('.btnChangeStatus').click(function () {
                 let categoryID = $(this).data('id');
-                console.log(categoryID);
                 $('#inputStatus').val(categoryID);
 
                 Swal.fire({
@@ -137,7 +141,37 @@
                 }
                 })
 
+            });
+
+            $('.btnDelete').click(function () {
+                let categoryID = $(this).data('id');
+                let categoryName = $(this).data('name');
+                $('#inputStatus').val(categoryID);
+                
+                Swal.fire({
+                title: 'Are you sure you want to delete ' + categoryName + ' ?',
+                showDenyButton: true,
+                showCancelButton: true,
+                confirmButtonText: 'Yes',
+                denyButtonText: `No`,
+                }).then((result) => {
+                /* Read more about isConfirmed, isDenied below */
+                if (result.isConfirmed) {
+                    $('#statusChangeForm').attr('action', "{{ route('categories.delete') }}");
+                    $('#statusChangeForm').submit();
+                } 
+                else if (result.isDenied) {
+                    // Swal.fire('Nothing action taken.', '', 'info')
+                    Swal.fire({
+                        title: 'Info',
+                        text: 'Nothing action taken.',
+                        confirmButtonText: 'OK',
+                        icon: 'info'
+                    });
+                }
                 })
+
+            });
             })
     </script>
 @endsection
