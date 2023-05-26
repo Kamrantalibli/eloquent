@@ -7,6 +7,15 @@ use Illuminate\Http\Request;
 
 class ArticleController extends Controller
 {
+
+    /**
+     * Class constructor.
+     */
+    public function __construct()
+    {
+        $this->middleware('language');
+    }
+
     public function index() {
         return view('admin.articles.list');
     }
