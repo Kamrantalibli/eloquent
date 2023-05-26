@@ -77,6 +77,7 @@
                                 <li><a class="dropdown-item" href="#"><img src="{{ asset('assets/admin/images/flags/china.png') }}" alt="">Chinese</a></li>
                             </ul>
                     </li>
+                    
                     <li class="nav-item hidden-on-mobile">
                         <a class="nav-link nav-notifications-toggle" id="notificationsDropDown" href="#" data-bs-toggle="dropdown">4</a>
                         <div class="dropdown-menu dropdown-menu-end notifications-dropdown" aria-labelledby="notificationsDropDown">
@@ -149,6 +150,19 @@
                                 </a>
                             </div>
                         </div>
+                    </li>
+
+                    <li class="nav-item hidden-on-mobile">
+                        <a class="nav-link nav-notifications-toggle" href="#" id="notificationsDropDown" data-bs-toggle="dropdown">{{ auth()->user()->name }}</a>
+                            <ul class="dropdown-menu dropdown-menu-end language-dropdown" aria-labelledby="languageDropDown">
+                                <li>
+                                    <a class="dropdown-item" href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Log Out</a>
+                                    <form action="{{ route('logout') }}" method="post" id="logout-form">
+                                        @csrf
+                                        
+                                    </form>
+                                </li>
+                            </ul>
                     </li>
                 </ul>
             </div>
