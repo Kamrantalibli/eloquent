@@ -24,7 +24,10 @@
                         <div class="alert alert-danger">{{ $error }}</div>
                     @endforeach
                 @endif --}}
-                <form action="{{ isset($article) ? route('article.edit', ['id' => $article->id]) : route('article.create') }}" method="POST">
+                @if ($errors->has('image'))
+                    <small class="text-danger">* {{ $errors->first('image') }}</small>
+                @endif
+                <form action="{{ isset($article) ? route('article.edit', ['id' => $article->id]) : route('article.create') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     @if ($errors->has('title'))
                         <small class="text-danger">* {{ $errors->first('title') }}</small>
@@ -77,7 +80,7 @@
 
 
                     <label for="summernote" class="form-label">Content</label>
-                    <div id="summernote" class="m-b-sm">Hello Summernote</div>
+                    <textarea name="body" id="summernote" class="m-b-sm">Hello Summernote</textarea>
 
                     @if ($errors->has('seo_keywords'))
                         <small class="text-danger">* {{ $errors->first('seo_keywords') }}</small>
@@ -106,9 +109,14 @@
                     <label for="publish_date" class="form-label">Publish Date</label>
                     <input class="form-control flatpickr2 m-b-sm" id="publish_date" name="publish_date" type="text" placeholder="When to share..">
 
+
                     <label for="image" class="form-label">Article Image</label>
                     <input type="file" name="image" id="image" class="form-control" accept="image/png, image/jpeg, image/jpg">
                     <div class="form-text m-b-sm">Article Image should be maximum 2MB</div>
+
+                    @if (isset($article) && $article->image)
+                        <img src="{{ asset($article->image) }}" alt="" class="img-fluid" style="max-height: 200px">
+                    @endif
 
                     <div class="form-check m-b-sm">
                         <input class="form-check-input" type="checkbox" name="status" value="1" id="status" {{ isset($article) && $article->status ? "checked" : "" }} >
