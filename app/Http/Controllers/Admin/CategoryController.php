@@ -6,14 +6,40 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use App\Models\Category;
+use App\Models\User;
 use App\Http\Requests\CategoryStorerequest;
 
 class CategoryController extends Controller
 {
-    public function index() {
-        $categories = Category::with(['parentCategory:id,name','user'])->orderBy('order', 'DESC')->paginate(5);
+    public function index(Request $request) {
 
-        return view('admin.categories.list', ['list' => $categories]);
+        $parentCategories = Category::all();
+        $users = User::all();
+
+        $parentID = $request->parent_id;
+        $userID = $request->user_id;
+
+        $categories = Category::with(['parentCategory:id,name','user'])
+            // ->where(function($query) use($parentID, $userID) {
+            //     if(!is_null($parentID)) {
+            //         $query->where('parent_id', $parentID)
+            //     }
+            //     if(!is_null($userID)) {
+            //         $query->where('user_id', $userID)
+            //     }
+            // })
+            ->name($request->name)
+            ->description($request->description)
+            ->slug($request->slug)
+            ->order($request->order)
+            ->status($request->status)
+            ->featureStatus($request->feature_status)
+            ->parentCategory($request->parent_id)
+            ->user($request->user_id)
+            ->orderBy('order', 'DESC')
+            ->paginate(5);
+
+        return view('admin.categories.list', ['list' => $categories, 'users' => $users, 'parentCategories' => $parentCategories]);
     }
 
     public function create() {
@@ -93,7 +119,7 @@ class CategoryController extends Controller
         return redirect()->route('category.index');
     }
 
-    public function delete(Request $request) {
+    public function delete(Request $request, Category $category) {
         $request->validate([
             'id' => ['required', 'integer', 'exists:categories']
         ]);

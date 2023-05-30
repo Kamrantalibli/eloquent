@@ -5,6 +5,7 @@
 @endsection
 
 @section('css')
+    <link rel="stylesheet" href="{{ asset('assets/admin/plugins/select2/css/select2.min.css') }}">
     <style>
         .table-hover > tbody >tr:hover {
             --bs-table-hover-bg: transparent;
@@ -21,6 +22,57 @@
         </x-slot>
 
         <x-slot name="body">
+            <form action="">
+                <div class="row">
+                    <div class="col-3 my-2">
+                        <input type="text" class="form-control" placeholder="Name" name="name" value="{{ request()->get('name') }}">
+                    </div>
+                    <div class="col-3 my-2">
+                        <input type="text" class="form-control" placeholder="Slug" name="slug" value="{{ request()->get('slug') }}">
+                    </div>
+                    <div class="col-3 my-2">
+                        <input type="text" class="form-control" placeholder="Description" name="description" value="{{ request()->get('description') }}">
+                    </div>
+                    <div class="col-3 my-2">
+                        <input type="text" class="form-control" placeholder="Order" name="order" value="{{ request()->get('order') }}">
+                    </div>
+                    <div class="col-3 my-2">
+                        <select class="js-states form-control" tabindex="-1" id="selectParentCategory" style="display:none; width:100%" name="parent_id">
+                            <option value="{{ null }}" >Select Parent Category</option>
+                            @foreach ($parentCategories as $parent)
+                                <option value="{{ $parent->id }}" {{ request()->get('parent_id') == $parent->id ? 'selected' : '' }} >{{ $parent->name }}</option>    
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-3 my-2">
+                        <select class="form-select" name="user_id" aria-label="Select Parent Category">
+                            <option value="{{ null }}" >Select User</option>
+                            @foreach ($users as $user)
+                                <option value="{{ $user->id }}" {{ request()->get('user_id') == $user->id ? 'selected' : '' }} >{{ $user->name }}</option>    
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-3 my-2">
+                        <select class="form-select" name="status" aria-label="Status">
+                            <option value="{{ null }}" >Status</option>
+                            <option value="0" {{ request()->get('status') === '0' ? 'selected' : '' }} >Passive</option>
+                            <option value="1" {{ request()->get('status') === '1' ? 'selected' : '' }} >Active</option>
+                        </select>
+                    </div>
+                    <div class="col-3 my-2">
+                        <select class="form-select" name="feature_status" aria-label="Feature Status">
+                            <option value="{{ null }}" >Feature Status</option>
+                            <option value="0" {{ request()->get('feature_status') === '0' ? 'selected' : '' }} >Passive</option>
+                            <option value="1" {{ request()->get('feature_status') === '1' ? 'selected' : '' }} >Active</option>
+                        </select>
+                    </div>
+                    <div class="col-12 d-flex justify-content-end my-2 gap-3">
+                        <button type="submit" class="btn btn-primary">Filter</button>
+                        <button type="submit" class="btn btn-warning">Reset Filter</button>
+                    </div>
+                </div>
+                <hr>
+            </form>
             <x-bootstrap.table 
             :class="'table-striped table-hover'"
             :isResponsive='true'>
@@ -75,7 +127,9 @@
             </x-bootstrap.table>
             <div class="d-flex justify-content-center">
                 {{-- {{ $list->links('vendor.pagination.bootstrap-5') }}    --}}
-                {{ $list->onEachside(1)->links() }}   
+                {{-- {{ $list->onEachside(1)->links() }}    --}}
+                {{-- {{ $list->appends($_GET)->onEachside(1)->links() }}    --}}
+                {{ $list->appends(request()->all())->onEachside(1)->links() }}   
             </div>
         </x-slot>
     </x-bootstrap.card>
@@ -86,6 +140,8 @@
 @endsection
 
 @section('js')
+    <script src="{{ asset('assets/admin/plugins/select2/js/select2.full.min.js') }}"></script>
+    <script src="{{ asset('assets/admin/js/pages/select2.js') }}"></script>
     <script>
         $(document).ready(function () {
             $('.btnChangeStatus').click(function () {
@@ -115,7 +171,7 @@
                 }
                 })
 
-                });  
+            });  
         
             $('.btnChangeFeatureStatus').click(function () {
                 let categoryID = $(this).data('id');
@@ -176,6 +232,8 @@
                 })
 
             });
+
+            $('#selectParentCategory').select2();
             })
     </script>
 @endsection
