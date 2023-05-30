@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\Category;
 
 class ArticleController extends Controller
 {
@@ -21,6 +22,9 @@ class ArticleController extends Controller
     }
 
     public function create() {
-        return view('admin.articles.create-update');
+
+        $categories = Category::all();
+
+        return view('admin.articles.create-update', compact('categories'));
     }
 }
