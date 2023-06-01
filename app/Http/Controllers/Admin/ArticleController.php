@@ -7,7 +7,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use App\Models\Category;
 use App\Models\Article;
+use App\Models\User;
 use App\Http\Requests\ArticleCreateRequest;
+use App\Http\Requests\ArticleUpdateRequest;
 
 class ArticleController extends Controller
 {
@@ -91,6 +93,94 @@ class ArticleController extends Controller
 
         dd($fileName);
         dd($request->all());
+    }
+
+    public function edit(Request $request, int $articleID) {
+        // $article = Article::find($articleID);
+        // $article = Article::where('id', $articleID)->firstOrFail();
+        $article = Article::query()->where('id', $articleID)->first();
+        $categories = Category::all();
+        $users = User::all();
+
+        if(is_null($article)) {
+            $statusText = 'Article not found';
+
+            alert()->error('Error', $statusText)->showConfirmButton('OK', '#3085d6')->autoClose(5000);
+            return redirect()->route('article.index');
+        }
+
+        return view('admin.articles.create-update', compact('article', 'categories', 'users'));
+        dd($article);
+    }
+
+    public function update(ArticleUpdateRequest $request) {
+
+        $data = $request->except('_token');
+        $slug = $data['slug'] ?? $data['title'];
+        $slug = Str::slug($slug);
+        $slugTitle = Str::slug($data['title']);   
+
+
+        $checkSlug = $this->slugCheck($slug);
+
+        if(!is_null($checkSlug)) {
+            $checkTitleSlug = $this->slugCheck($slugTitle);
+            if(!is_null($checkTitleSlug)) {
+                // If title Slug is not empty
+                $slug = Str::slug($slug . time());
+            }
+            else {
+                $slug = $slugTitle;
+            }
+        }
+        
+        $data['slug'] = $slug;
+
+        if(!is_null($request->image)) {
+            $imageFile = $request->file('image');
+            $originalName = $imageFile->getClientOriginalName();
+            $originalExtension = $imageFile->getClientOriginalExtension();
+            // $originalExtension = $imageFile->extension();
+            $explodeName = explode('.', $originalName)[0];
+            $fileName = Str::slug($explodeName) . '.' . $originalExtension;
+    
+            $folder = 'articles';
+            $publicPath = 'storage/'. $folder;
+
+            if(file_exists(public_path($publicPath . $fileName))) {
+            
+                return redirect()->back()->withErrors([
+                    'image' => 'Same image already uploaded.'
+                ]);
+    
+            }
+
+            $data['image'] = $publicPath . '/' . $fileName;
+        }
+
+        $data['user_id'] = auth()->id();
+
+        $articleQuery = Article::query()
+                 ->where('id', $request->id);
+
+        $articleFind = $articleQuery->first();
+
+        $articleQuery->update($data)
+
+        if(!is_null($request->image)) {
+            // Storage::delete(public_path($articleFind->image));
+            if(file_exists(public_path($articleFind->image))) {
+                \File::delete(public_path($articleFind->image))
+            }
+            $imageFile->storeAs($folder, $fileName);
+        }
+
+        alert()
+            ->success("Successful", "Article Updated")
+            ->showConfirmButton('OK', '#3085d6')
+            ->autoClose(5000);
+
+        return redirect()->route('article.index');
     }
     
     public function slugCheck(string $text) {

@@ -107,7 +107,12 @@
                         style="resize: none">{{ isset($article) ? $article->seo_description : '' }}</textarea>
 
                     <label for="publish_date" class="form-label">Publish Date</label>
-                    <input class="form-control flatpickr2 m-b-sm" id="publish_date" name="publish_date" type="text" placeholder="When to share..">
+                    <input class="form-control flatpickr2 m-b-sm" 
+                           type="text" 
+                           id="publish_date" 
+                           name="publish_date" 
+                           value="{{ isset($article) ? $article->publish_date : '' }}" 
+                           placeholder="When to share..">
 
 
                     <label for="image" class="form-label">Article Image</label>
