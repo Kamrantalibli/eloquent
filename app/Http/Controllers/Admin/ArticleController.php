@@ -10,6 +10,7 @@ use App\Models\Article;
 use App\Models\User;
 use App\Http\Requests\ArticleCreateRequest;
 use App\Http\Requests\ArticleUpdateRequest;
+use App\Http\Requests\ArticleFilterRequest;
 
 class ArticleController extends Controller
 {
@@ -22,8 +23,24 @@ class ArticleController extends Controller
         $this->middleware('language');
     }
 
-    public function index() {
-        return view('admin.articles.list');
+    public function index(ArticleFilterRequest $request) {
+        $users = User::all();
+        $categories = Category::all();
+
+        $list = Article::query()
+                        ->with(['category', 'user'])
+                        ->where(function($query) use ($request) {
+                            $query->orWhere('title', 'LIKE', '%' . $request->search_text)
+                                  ->orWhere('slug', 'LIKE', '%' . $request->search_text)
+                                  ->orWhere('body', 'LIKE', '%' . $request->search_text)
+                                  ->orWhere('tags', 'LIKE', '%' . $request->search_text);
+                        })
+                        ->status($request->status)
+                        ->category($request->category_id)
+                        ->user($request->user_id)
+                        ->publishDate($request->publish_date)
+                        ->paginate(5);
+        return view('admin.articles.list', compact('users', 'categories', 'list'));
     }
 
     public function create() {
@@ -165,12 +182,12 @@ class ArticleController extends Controller
 
         $articleFind = $articleQuery->first();
 
-        $articleQuery->update($data)
+        $articleQuery->update($data);
 
         if(!is_null($request->image)) {
             // Storage::delete(public_path($articleFind->image));
             if(file_exists(public_path($articleFind->image))) {
-                \File::delete(public_path($articleFind->image))
+                \File::delete(public_path($articleFind->image));
             }
             $imageFile->storeAs($folder, $fileName);
         }
