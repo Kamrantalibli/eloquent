@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Str;
 use App\Models\Category;
 use App\Models\Article;
@@ -39,6 +40,23 @@ class ArticleController extends Controller
                         ->category($request->category_id)
                         ->user($request->user_id)
                         ->publishDate($request->publish_date)
+                        ->where(function($query) use ($request) {
+                            if($request->min_view_count) {
+                                $query->where('view_count', '>=', (int)$request->min_view_count);
+                            }
+
+                            if($request->max_view_count) {
+                                $query->where('view_count', '<=', (int)$request->max_view_count);
+                            }
+
+                            if($request->min_like_count) {
+                                $query->where('like_count', '>=', (int)$request->min_like_count);
+                            }
+
+                            if($request->max_like_count) {
+                                $query->where('like_count', '<=', (int)$request->max_like_count);
+                            }
+                        })
                         ->paginate(5);
         return view('admin.articles.list', compact('users', 'categories', 'list'));
     }
@@ -203,4 +221,43 @@ class ArticleController extends Controller
     public function slugCheck(string $text) {
         return Article::where('slug',$text)->first();
     }
+
+    public function changeStatus(Request $request): JsonResponse {
+        $articleID = $request->articleID;
+
+        $article = Article::query()->where('id', $articleID)->first();
+
+        if ($article) {
+            $article->status = $article->status ? 0 : 1;
+            $article->save();
+
+            return response()
+                   ->json(['status' => 'success','message' => 'Successful', 'data' => $article, 'article_status' => $article->status])
+                   ->setStatusCode(200);
+        }
+
+        return response()
+                   ->json(['status' => 'error','message' => 'Article not found'])
+                   ->setStatusCode(404);
+
+    }
+
+    public function delete(Request $request) {
+        $articleID = $request->articleID;
+
+        $article = Article::query()->where('id', $articleID)->first();
+
+        if($article) {
+            $article->delete();
+
+            return response()
+                   ->json(['status' => 'success','message' => 'Successful', 'data' => ''])
+                   ->setStatusCode(200);
+        }
+
+        return response()
+                   ->json(['status' => 'error','message' => 'Article not found'])
+                   ->setStatusCode(404);
+    }
+
 }

@@ -29,7 +29,7 @@
                         <select class="js-states form-control" tabindex="-1" id="selectParentCategory" style="display:none; width:100%" name="category_id">
                             <option value="{{ null }}" >Select Category</option>
                             @foreach ($categories as $category)
-                                <option value="{{ $category->id }}" {{ request()->get('parent_id') == $category->id ? 'selected' : '' }} >{{ $category->name }}</option>    
+                                <option value="{{ $category->id }}" {{ request()->get('category_id') == $category->id ? 'selected' : '' }} >{{ $category->name }}</option>    
                             @endforeach
                         </select>
                     </div>
@@ -109,7 +109,7 @@
                 </x-slot:columns>
                 <x-slot:rows>
                     @foreach ($list as $article)
-                        <tr>
+                        <tr id="row-{{ $article->id }}">
                             <td>
                                 @if (!empty($article->image))
                                     <img src="{{ asset($article->image) }}" alt="" height="100" class="img-fluid">
@@ -133,11 +133,11 @@
                             <td>{{ $article->view_count }}</td>
                             <td>{{ $article->like_count }}</td>
                             <td>{{ $article->category->name }}</td>
-                            <td>{{ $article->publish_date }}</td>
+                            <td>{{ \Carbon\Carbon::parse($article->publish_date)->format('d F Y H:i:s') }}</td>
                             <td>{{ $article->user->name }}</td>
                             <td>
                                 <div class="d-flex">
-                                    <a href="javascript:void(0)" class="btn btn-warning btn-sm"><i class="material-icons ms-0">edit</i></a>
+                                    <a href="{{ route('article.edit', ['id' => $article->id]) }}" class="btn btn-warning btn-sm"><i class="material-icons ms-0">edit</i></a>
                                     <a href="javascript:void(0)" 
                                         class="btn btn-danger btn-sm btnDelete"
                                         data-name="{{ $article->title }}" 
@@ -158,10 +158,6 @@
             </div>
         </x-slot>
     </x-bootstrap.card>
-    <form action="" method="POST" id="statusChangeForm">
-        @csrf
-        <input type="hidden" name="id" id="inputStatus" value="">
-    </form>
 @endsection
 
 @section('js')
@@ -174,9 +170,9 @@
     <script>
         $(document).ready(function () {
             $('.btnChangeStatus').click(function () {
-                let categoryID = $(this).data('id');
-                $('#inputStatus').val(categoryID);
-
+                let articleID = $(this).data('id');
+                $('#inputStatus').val(articleID);
+                let self = $(this);
                 Swal.fire({
                 title: 'Are you sure you want to change Status?',
                 showDenyButton: true,
@@ -186,8 +182,36 @@
                 }).then((result) => {
                 /* Read more about isConfirmed, isDenied below */
                 if (result.isConfirmed) {
-                    $('#statusChangeForm').attr('action', "{{ route('categories.changeStatus') }}");
-                    $('#statusChangeForm').submit();
+                    $.ajax({
+                        method:'POST',
+                        url: "{{ route('article.changeStatus') }}",
+                        data: {
+                            'articleID' : articleID
+                        },
+                        async:false,
+                        success: function(data) {
+                            if (data.article_status) {
+                                self.removeClass('btn-danger');
+                                self.addClass('btn-success');
+                                self.text('Active');
+                            }
+                            else {
+                                self.removeClass('btn-success');
+                                self.addClass('btn-danger');
+                                self.text('Passive');
+                            }
+
+                            Swal.fire({
+                                title: 'Success',
+                                text: 'Status updated',
+                                confirmButtonText: 'OK',
+                                icon: 'success'
+                            });
+                        },
+                        error: function () {
+                            console.log('error');
+                        }
+                    })
                 } 
                 else if (result.isDenied) {
                     // Swal.fire('Nothing action taken.', '', 'info')
@@ -201,44 +225,14 @@
                 })
 
             });  
-        
-            $('.btnChangeFeatureStatus').click(function () {
-                let categoryID = $(this).data('id');
-                console.log(categoryID);
-                $('#inputStatus').val(categoryID);
-
-                Swal.fire({
-                title: 'Are you sure you want to change Feature Status?',
-                showDenyButton: true,
-                showCancelButton: true,
-                confirmButtonText: 'Yes',
-                denyButtonText: `No`,
-                }).then((result) => {
-                /* Read more about isConfirmed, isDenied below */
-                if (result.isConfirmed) {
-                    $('#statusChangeForm').attr('action', "{{ route('categories.changeFeatureStatus') }}");
-                    $('#statusChangeForm').submit();
-                } 
-                else if (result.isDenied) {
-                    // Swal.fire('Nothing action taken.', '', 'info')
-                    Swal.fire({
-                        title: 'Info',
-                        text: 'Nothing action taken.',
-                        confirmButtonText: 'OK',
-                        icon: 'info'
-                    });
-                }
-                })
-
-            });
 
             $('.btnDelete').click(function () {
-                let categoryID = $(this).data('id');
-                let categoryName = $(this).data('name');
-                $('#inputStatus').val(categoryID);
+                let articleID = $(this).data('id');
+                let articleTitle = $(this).data('name');
+                $('#inputStatus').val(articleID);
                 
                 Swal.fire({
-                title: 'Are you sure you want to delete ' + categoryName + ' ?',
+                title: 'Are you sure you want to delete ' + articleTitle + ' ?',
                 showDenyButton: true,
                 showCancelButton: true,
                 confirmButtonText: 'Yes',
@@ -246,8 +240,30 @@
                 }).then((result) => {
                 /* Read more about isConfirmed, isDenied below */
                 if (result.isConfirmed) {
-                    $('#statusChangeForm').attr('action', "{{ route('categories.delete') }}");
-                    $('#statusChangeForm').submit();
+                    $.ajax({
+                        method:'POST',
+                        url: "{{ route('article.delete') }}",
+                        data: {
+                            '_method' : 'DELETE',
+                            'articleID' : articleID
+                        },
+                        async:false,
+                        success: function(data) {
+                            
+                            $('#row-' + articleID).remove();
+
+                            Swal.fire({
+                                title: 'Success',
+                                text: 'Article deleted',
+                                confirmButtonText: 'OK',
+                                icon: 'success'
+                            });
+
+                        },
+                        error: function () {
+                            console.log('error');
+                        }
+                    })
                 } 
                 else if (result.isDenied) {
                     // Swal.fire('Nothing action taken.', '', 'info')
