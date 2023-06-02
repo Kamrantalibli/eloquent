@@ -1,0 +1,38 @@
+body{
+    background-color: #f5f8f9;
+}
+
+.header-border {
+    border-bottom: 1px solid #eceff2;
+}
+
+.header-h {
+    min-height: 80px;
+}
+
+#search_text {
+    border: none;
+    border-bottom: 1px solid #eee;
+}
+
+#search_text:focus-visible {
+    outline: unset !important;
+}
+
+.logo-h {
+    max-height: 35px;
+}
+
+.header-text p,.header-search span {
+    margin: 0;
+}
+
+.header-search span:hover {
+    cursor: pointer;
+}
+
+@media screen and (max-width:768px) {
+    .header-text p {
+        font-size: 10px;
+    }
+}
